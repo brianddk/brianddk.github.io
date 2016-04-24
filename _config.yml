@@ -17,6 +17,8 @@ twitter_username: dkbriand
 github_username:  brianddk
 
 # Build settings
+timezone: America/Chicago
+permalink: /:year/:month/:title/
 markdown: kramdown
 
 kramdown:
