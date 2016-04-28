@@ -1,8 +1,11 @@
 ---
 layout: post
 title:  "hp35s Software"
+date:   2016-04-28 08:30 -0500
 categories: calc hp35s
 ---
+This is a small collection of useful hp 35s program listings (aka software) for use by 35s owners.  Some are from the hp-32 or hp-33, but should be usable with only very minor modifications.  Most of these are obviously found at [The Museum of HP Calculators](http://www.hpmuseum.org/).  Hats off to that great group of enthusiasts.
+
 1.  [Curve Fitting](http://www.stefanv.com/calculators/hp35s_curve_fitting.html)
 2.  [Matrix Multi-tool](http://www.stefanv.com/calculators/hp35s_matrix_multitool.html)
 3.  [NCS35TB Stat Pac](http://www.namirshammas.com/NCSStatPac/NCSSTATPAC.htm), (contains a set of statistical programs for the HP-35s)
