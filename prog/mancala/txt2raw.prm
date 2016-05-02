@@ -1,0 +1,41 @@
+# This file contains character sequences that will be substituted in strings,
+# IN THE SAME ORDER that they appear here.
+# Ex: \r<tab>13 will make any '\r' sequence INSIDE a string to be replaced with
+# chr(13).
+# Comments can be added in lines that start with '#'.
+# Be careful - non-translated sequences can make a string longer than 15
+# characters. This may cause problems when the new raw file is imported.
+
+÷	0
+×	1
+\sqrt	2
+\int	3
+\gray1	4
+\Sigma	5
+\pi	7
+\191	8
+<=	9
+>=	11
+!=	12
+\r	13
+\LF	10
+\down	14
+->	15
+\right	15
+<-	16
+\left	16
+\181	17
+\163	18
+\176	19
+\197	20
+\209	21
+\196	22
+\angle	23
+\198	25
+\esc	27
+\214	28
+\220	29
+\gray2	30
+\bullet	31
+\\	92
+\up	94
