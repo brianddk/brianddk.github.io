@@ -3,3 +3,4 @@ _site
 .jekyll-metadata
 prog/mancala/mancala.asm.txt
 prog/mancala/mancala.asm.txt.raw
+prog/mancala/print.txt
