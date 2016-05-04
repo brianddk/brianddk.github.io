@@ -24,18 +24,18 @@ LBL "MANCA"
         CF 3
         CF 4
         13
-        STO I      		; .I.
+        STO I      		; i
         4
         LBL [INIT-LOOP]
-        STO (I)  		; 4->(I)
-        DSE I      		; DSE.I
+        STO (I)  		; 4->(i)
+        DSE I      		; DSE i
         GTO [INIT-LOOP]
         0
-        STO (I)  		; 0->(I), .I = 0
+        STO (I)  		; 0->(i), i = 0
         7
         STO I
         X<>Y
-        STO (I)  		; 0->(I), .I = 7
+        STO (I)  		; 0->(i), i = 7
         SF 1        		; P1'S Turn
         GRAD        		; 42s Only, P1 indicator
     RTN
@@ -44,15 +44,15 @@ LBL "MANCA"
     LBL [CHECK-WINNER]
         CF 3                ; Clear winner found flag
         0
-        STO J              ; .J
+        STO J              ; j
         7
-        STO I              ; .I
+        STO I              ; i
         24
-        RCL (I)          ; (I)
-        X>Y?
+        RCL (I)          ; (i)
+        X>=Y?
         GTO [P1-WINNER]
         X<>Y
-        RCL (J)          ; (J)
+        RCL (J)          ; (j)
         X>Y?
         GTO [P2-WINNER]
         GTO [WINNER-RTN]
@@ -70,11 +70,11 @@ LBL "MANCA"
     ; Display the board
     LBL [DISPLAY]
         1.006
-        STO I              ; .I
+        STO I              ; i
         14
-        STO J              ; @(J) == @(14)
+        STO J              ; "$(j)" == "$(14)"
         1000000.0
-        STO (J)          ; (J)=0
+        STO (J)          ; (j)=1,000,000
         LBL [P1-BOARD]
             ;STOP
             10.0            ; WARN Base 10 for now
@@ -82,14 +82,14 @@ LBL "MANCA"
             RCL I          ; .I
             IP
             -
-            Y^X             ; I.0^(6-ip(i))
-            RCL (I)      ; (I)
-            x               ; I.0^(6-ip(i)) * @(i)
-            STO+ (J)     ; @(j) += I^(6-ip(i)) + @(i)
-            ISG I          ; .I
+            Y^X             ; i^(6-ip(i))
+            RCL (I)      ; (i)
+            x               ; i^(6-ip(i)) * $(i)
+            STO+ (J)     ; @(j) += i^(6-ip(i)) + $(i)
+            ISG I          ; i
         GTO [P1-BOARD]
         15
-        STO J              ; .J = P2-vector
+        STO J              ; j = P2-vector
         1000000.0
         STO (J)
         13.007
@@ -108,7 +108,7 @@ LBL "MANCA"
             DSE I
         GTO [P2-BOARD]
         14
-        STO I              ; .I = P1-vector
+        STO I              ; i = P1-vector
         ;                   ; 42s only code begin
         FIX 2
         RCL 7                   ; P1 SCORE
@@ -139,34 +139,33 @@ LBL "MANCA"
         SF 4
         FS? 4
         GTO [PICK-DONE]
-        STO I              ; .I=PICK
-        STO J              ; .J=PICK
+        STO I              ; i=PICK
         FS? 1
         GTO [CHECK-PICK]
         14
         X<>Y
         -
-        STO J              ; .J
+        STO I              ; i
         LBL [CHECK-PICK]
-        RCL (J)          ; (J)
+        RCL (I)          ; (i)
         X=0?
         SF 4
         LBL [PICK-DONE]
-        RCL I              ; .I
+        RCL I              ; i
     RTN
     ;
     ; Move beans from selected pit
     LBL [MOVE]
         0
-        X<> (I)          ; .(I)= 0 (MOVE BEANS OUT)
-        STO J              ; .J=VALUE PREVIOUSLY IN .(I)
+        X<> (I)          ; (i)= 0 (MOVE BEANS OUT)
+        STO J              ; j=VALUE PREVIOUSLY IN (i)
         LBL [MOVE-LOOP]
         ; .INCI SUBROUTINE-INLINE
             1
-            RCL+ I         ; .I++ (MOVE REGISTER FORWARD)
+            RCL+ I         ; i++ (MOVE REGISTER FORWARD)
             14
             MOD
-            STO I           ; .I=(I+1)MOD(14)
+            STO I           ; i=(i+1)MOD(14)
             FS? 1           ; P1?
             XEQ [SKIP0]     ; SKIP0 IF P1
             FS? 2
@@ -196,9 +195,26 @@ LBL "MANCA"
     ;
     ; Switch to other players turn
     LBL [SWITCH]
+        FS? 1
+        GTO [SWITCHTO-P2]
+            CF 2
+            SF 1
+            GRAD
+            GTO [SWITCH-DONE]
+        LBL [SWITCHTO-P2]
+            CF 1
+            SF 2
+            RAD
+        LBL [SWITCH-DONE]
     RTN
     ;
     ; Clean up after game
     LBL [CLEANUP]
+        CF 1
+        CF 2
+        CF 3
+        CF 4
+        FIX 4
+        DEG
     RTN
 END

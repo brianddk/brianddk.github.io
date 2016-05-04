@@ -13,6 +13,7 @@ make-sed() {
     echo "s/\s(J)/ IND $jvar/g"
     echo "s/\<I\>/$ivar/g"
     echo "s/\<J\>/$jvar/g"
+    echo "/^\s*$/d"
     while read line
     do
         i=$((i+1))
