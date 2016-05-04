@@ -24,18 +24,18 @@ LBL "MANCA"
         CF 3
         CF 4
         13
-        STO I      		; .I
+        STO I      		; .I.
         4
         LBL [INIT-LOOP]
         STO (I)  		; 4->(I)
-        DSE I      		; DSE I
+        DSE I      		; DSE.I
         GTO [INIT-LOOP]
         0
-        STO (I)  		; 0->(I), I = 0
+        STO (I)  		; 0->(I), .I = 0
         7
         STO I
         X<>Y
-        STO (I)  		; 0->(I), I = 7
+        STO (I)  		; 0->(I), .I = 7
         SF 1        		; P1'S Turn
         GRAD        		; 42s Only, P1 indicator
     RTN
@@ -73,7 +73,7 @@ LBL "MANCA"
         STO I              ; .I
         14
         STO J              ; @(J) == @(14)
-        0
+        1000000.0
         STO (J)          ; (J)=0
         LBL [P1-BOARD]
             ;STOP
@@ -90,7 +90,7 @@ LBL "MANCA"
         GTO [P1-BOARD]
         15
         STO J              ; .J = P2-vector
-        0
+        1000000.0
         STO (J)
         13.007
         STO I
@@ -127,6 +127,7 @@ LBL "MANCA"
     ;
     ; Pick a pit to move
     LBL [PICK]
+        CF 4
         IP
         1
         X<>Y
@@ -157,32 +158,40 @@ LBL "MANCA"
     ; Move beans from selected pit
     LBL [MOVE]
         0
-        X<> (I)          ; X<>(I)
-        STO J              ; .J=
+        X<> (I)          ; .(I)= 0 (MOVE BEANS OUT)
+        STO J              ; .J=VALUE PREVIOUSLY IN .(I)
         LBL [MOVE-LOOP]
         ; .INCI SUBROUTINE-INLINE
             1
-            RCL+ I         ; .I
+            RCL+ I         ; .I++ (MOVE REGISTER FORWARD)
             14
             MOD
-            STO I          ; .I
+            STO I           ; .I=(I+1)MOD(14)
             FS? 1           ; P1?
-            XEQ [SKIP0]
+            XEQ [SKIP0]     ; SKIP0 IF P1
             FS? 2
-            XEQ [SKIP7]
+            XEQ [SKIP7]     ; SKIP7 IF P2
         ; .INCI END-SUBROUTINE-INLINE
         1
-        STO+ (I)         ; (i)
-        DSE I
+        STO+ (I)         ; (i)=(i)+1
+        DSE J            ; j--
         GTO [MOVE-LOOP]
     RTN
     ;
     ; SKIP0
     LBL [SKIP0]
+        X=0?
+        ISG I
+        CF 0            ; NOP
     RTN
     ;
     ; SKIP7
     LBL [SKIP7]
+        7
+        X<>Y
+        X=Y?
+        ISG I
+        CF 0            ; NOP
     RTN
     ;
     ; Switch to other players turn
