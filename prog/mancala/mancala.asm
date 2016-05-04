@@ -17,25 +17,25 @@ LBL "MANCA"
         XEQ [CLEANUP]
     RTN
     ;
-    ; Init registers
+    ; .Init registers
     LBL [INIT]
         CF 1
         CF 2
         CF 3
         CF 4
         13
-        STO 16      		; I
+        STO I      		; .I
         4
         LBL [INIT-LOOP]
-        STO IND 16  		; 4->(I)
-        DSE 16      		; DSE I
+        STO (I)  		; 4->(I)
+        DSE I      		; DSE I
         GTO [INIT-LOOP]
         0
-        STO IND 16  		; 0->(I), I = 0
+        STO (I)  		; 0->(I), I = 0
         7
-        STO 16
+        STO I
         X<>Y
-        STO IND 16  		; 0->(I), I = 7
+        STO (I)  		; 0->(I), I = 7
         SF 1        		; P1'S Turn
         GRAD        		; 42s Only, P1 indicator
     RTN
@@ -44,15 +44,15 @@ LBL "MANCA"
     LBL [CHECK-WINNER]
         CF 3                ; Clear winner found flag
         0
-        STO 17              ; J
+        STO J              ; .J
         7
-        STO 16              ; I
+        STO I              ; .I
         24
-        RCL IND 16          ; (I)
+        RCL (I)          ; (I)
         X>Y?
         GTO [P1-WINNER]
         X<>Y
-        RCL IND 17          ; (J)
+        RCL (J)          ; (J)
         X>Y?
         GTO [P2-WINNER]
         GTO [WINNER-RTN]
@@ -70,58 +70,58 @@ LBL "MANCA"
     ; Display the board
     LBL [DISPLAY]
         1.006
-        STO 16              ; I
+        STO I              ; .I
         14
-        STO 17              ; @(J) == @(14)
+        STO J              ; @(J) == @(14)
         0
-        STO IND 17          ; (J)=0
+        STO (J)          ; (J)=0
         LBL [P1-BOARD]
             ;STOP
             10.0            ; WARN Base 10 for now
             6
-            RCL 16          ; I
+            RCL I          ; .I
             IP
             -
-            Y^X             ; 16.0^(6-ip(i))
-            RCL IND 16      ; (I)
-            x               ; 16.0^(6-ip(i)) * @(i)
-            STO+ IND 17     ; @(j) += 16^(6-ip(i)) + @(i)
-            ISG 16          ; I
+            Y^X             ; I.0^(6-ip(i))
+            RCL (I)      ; (I)
+            x               ; I.0^(6-ip(i)) * @(i)
+            STO+ (J)     ; @(j) += I^(6-ip(i)) + @(i)
+            ISG I          ; .I
         GTO [P1-BOARD]
         15
-        STO 17              ; J = P2-vector
+        STO J              ; .J = P2-vector
         0
-        STO IND 17
+        STO (J)
         13.007
-        STO 16
+        STO I
         LBL [P2-BOARD]
             ;STOP
             10.0            ; WARN Base 10 for now
-            RCL 16
+            RCL I
             IP
             8
             -
             Y^X
-            RCL IND 16
+            RCL (I)
             x
-            STO+ IND 17
-            DSE 16
+            STO+ (J)
+            DSE I
         GTO [P2-BOARD]
         14
-        STO 16              ; I = P1-vector
+        STO I              ; .I = P1-vector
         ;                   ; 42s only code begin
         FIX 2
         RCL 7                   ; P1 SCORE
         100
         /
-        STO+ IND 16             ; P1 VECTOR
+        STO+ (I)             ; P1 VECTOR
         RCL 0
         100
         /
-        STO+ IND 17             ; P2 VECTOR
+        STO+ (J)             ; P2 VECTOR
         ;                   ; 42s only code end
-        RCL IND 17          ; P2
-        RCL IND 16          ; P1
+        RCL (J)          ; P2
+        RCL (I)          ; P1
         STOP
     RTN
     ;
@@ -138,42 +138,42 @@ LBL "MANCA"
         SF 4
         FS? 4
         GTO [PICK-DONE]
-        STO 16              ; I=PICK
-        STO 17              ; J=PICK
+        STO I              ; .I=PICK
+        STO J              ; .J=PICK
         FS? 1
         GTO [CHECK-PICK]
         14
         X<>Y
         -
-        STO 17              ; J
+        STO J              ; .J
         LBL [CHECK-PICK]
-        RCL IND 17          ; (J)
+        RCL (J)          ; (J)
         X=0?
         SF 4
         LBL [PICK-DONE]
-        RCL 16              ; I
+        RCL I              ; .I
     RTN
     ;
     ; Move beans from selected pit
     LBL [MOVE]
         0
-        X<> IND 16          ; X<>(I)
-        STO 17              ; J=
+        X<> (I)          ; X<>(I)
+        STO J              ; .J=
         LBL [MOVE-LOOP]
-        ; INCI SUBROUTINE-INLINE
+        ; .INCI SUBROUTINE-INLINE
             1
-            RCL+ 16         ; I
+            RCL+ I         ; .I
             14
             MOD
-            STO 16          ; I
+            STO I          ; .I
             FS? 1           ; P1?
             XEQ [SKIP0]
             FS? 2
             XEQ [SKIP7]
-        ; INCI END-SUBROUTINE-INLINE
+        ; .INCI END-SUBROUTINE-INLINE
         1
-        STO+ IND 16         ; (i)
-        DSE 16
+        STO+ (I)         ; (i)
+        DSE I
         GTO [MOVE-LOOP]
     RTN
     ;
