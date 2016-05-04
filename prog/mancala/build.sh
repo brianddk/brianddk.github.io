@@ -14,6 +14,7 @@ make-sed() {
     echo "s/\<I\>/$ivar/g"
     echo "s/\<J\>/$jvar/g"
     echo "/^\s*$/d"
+    echo "/^\s*;.*$/d"
     while read line
     do
         i=$((i+1))

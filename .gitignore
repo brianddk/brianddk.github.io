@@ -4,3 +4,5 @@ _site
 prog/mancala/mancala.asm.txt
 prog/mancala/mancala.asm.txt.raw
 prog/mancala/print.txt
+prog/mancala/txt2raw.pl
+prog/mancala/txt2raw.prm
