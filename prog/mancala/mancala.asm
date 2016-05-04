@@ -77,14 +77,14 @@ LBL "MANCA"
         STO IND 17          ; (J)=0
         LBL [P1-BOARD]
             ;STOP
-            10.0            ; WARN Base 10 for now              
+            10.0            ; WARN Base 10 for now
             6
             RCL 16          ; I
             IP
             -
-            Y^X             ; 16^(6-ip(i))
+            Y^X             ; 16.0^(6-ip(i))
             RCL IND 16      ; (I)
-            x               ; 16^(6-ip(i)) * @(i)
+            x               ; 16.0^(6-ip(i)) * @(i)
             STO+ IND 17     ; @(j) += 16^(6-ip(i)) + @(i)
             ISG 16          ; I
         GTO [P1-BOARD]
@@ -127,10 +127,62 @@ LBL "MANCA"
     ;
     ; Pick a pit to move
     LBL [PICK]
+        IP
+        1
+        X<>Y
+        X<Y?
+        SF 4
+        6
+        X<>Y
+        X>Y?
+        SF 4
+        FS? 4
+        GTO [PICK-DONE]
+        STO 16              ; I=PICK
+        STO 17              ; J=PICK
+        FS? 1
+        GTO [CHECK-PICK]
+        14
+        X<>Y
+        -
+        STO 17              ; J
+        LBL [CHECK-PICK]
+        RCL IND 17          ; (J)
+        X=0?
+        SF 4
+        LBL [PICK-DONE]
+        RCL 16              ; I
     RTN
     ;
     ; Move beans from selected pit
     LBL [MOVE]
+        0
+        X<> IND 16          ; X<>(I)
+        STO 17              ; J=
+        LBL [MOVE-LOOP]
+        ; INCI SUBROUTINE-INLINE
+            1
+            RCL+ 16         ; I
+            14
+            MOD
+            STO 16          ; I
+            FS? 1           ; P1?
+            XEQ [SKIP0]
+            FS? 2
+            XEQ [SKIP7]
+        ; INCI END-SUBROUTINE-INLINE
+        1
+        STO+ IND 16         ; (i)
+        DSE 16
+        GTO [MOVE-LOOP]
+    RTN
+    ;
+    ; SKIP0
+    LBL [SKIP0]
+    RTN
+    ;
+    ; SKIP7
+    LBL [SKIP7]
     RTN
     ;
     ; Switch to other players turn

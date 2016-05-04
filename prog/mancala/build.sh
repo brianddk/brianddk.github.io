@@ -5,9 +5,15 @@ get-label() {
 }
 
 make-sed() {
+    local ivar=16
+    local jvar=17
     local i
     echo "s/^\s\+;.*//g"
-    while read line    
+    echo "s/\s(I)/ IND $ivar/g"
+    echo "s/\s(J)/ IND $jvar/g"
+    echo "s/\<I\>/$ivar/g"
+    echo "s/\<J\>/$jvar/g"
+    while read line
     do
         i=$((i+1))
         echo "s/\(\[$line\]\)/$i\t;\1/g"
