@@ -18,7 +18,8 @@ make-sed() {
     while read line
     do
         i=$((i+1))
-        echo "s/\(\[$line\]\)/$i\t;\1/g"
+        ich=$( printf '%02d' $i )
+        echo "s/\(\[$line\]\)/$ich\t;\1/g"
     done
 }
 
@@ -26,5 +27,6 @@ show-list() {
     sed -f /dev/stdin $1
 }
 
-get-label $1 | make-sed | show-list $1 > $1.txt
-perl txt2raw.pl $1.txt
+get-label $1 | make-sed
+#| show-list $1 > $1.txt
+#perl txt2raw.pl $1.txt
