@@ -88,7 +88,7 @@ Here are the listings, but do recall that you will likely need to understand tha
 [`mancala.asm`](https://github.com/brianddk/brianddk.github.io/blob/master/prog/mancala/mancala.asm)
 
 ```asm
- "MANCA"
+LBL "MANCA"
     ;Main Mancala program
         XEQ [INIT]                      ; Init the game registers
         LBL [MAIN]                      ; Main game loop
