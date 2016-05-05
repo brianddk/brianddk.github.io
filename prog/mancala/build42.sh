@@ -4,7 +4,7 @@ get-label() {
     grep 'LBL \[' $1 | awk '{print $3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
 }
 
-make-sed42() {
+make-sed() {
     local ivar=16
     local jvar=17
     local i
@@ -30,18 +30,17 @@ pre-process() {
     echo "/^\s*;.*$/d"
 }
 
-add-lnum42() {
+add-lnum() {
     while IFS= read line
     do
         i=$((i+1))
         printf '%03d %s\n' "$i" "$line" 
-        #if i>1
     done
 }
 
-file-withnum42() {
-    pre-process | sed-list $1 | add-lnum42
+file-withnum() {
+    pre-process | sed-list $1 | add-lnum
 }
 
-get-label <(file-withnum42 $1) | make-sed42 | sed-list <(file-withnum42 $1) > $1.txt
+get-label <(file-withnum $1) | make-sed | sed-list <(file-withnum $1) > $1.txt
 perl txt2raw.pl $1.txt
