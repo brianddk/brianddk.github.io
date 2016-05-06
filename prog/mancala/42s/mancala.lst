@@ -1,0 +1,235 @@
+001 LBL "MANCA"
+002         XEQ 07	;[INIT]                      ; Init the game registers
+003         LBL 09	;[MAIN]                      ; Main game loop
+004             XEQ 02	;[CHECK-WINNER]          ; Check for a winner
+005             FS? 3                       ; Flag3 = Winner Found!
+006                 GTO 05	;[DONE]              ; Finished when a winner is found
+007             LBL 20	;[REDISPLAY]             ; Come here if we pick bad
+008             XEQ 04	;[DISPLAY]               ; Display the game board
+009             XEQ 18	;[PICK]                  ; Pick a move
+010             FS? 4                       ; Invalid move?
+011                 GTO 20	;[REDISPLAY]         ; .. Redisplay
+012             XEQ 10	;[MOVE]                  ; Move the beans
+013             XEQ 23	;[SWITCH]                ; Swithch players
+014         GTO 09	;[MAIN]                      ; Loop for next move
+015         LBL 05	;[DONE]                      ; This is where we finish
+016         XEQ 03	;[CLEANUP]                   ; Cleanup we are done
+017     RTN
+018     LBL 07	;[INIT]                          ; Init the game registers
+019         CF 1                            ; Clear our flag regs
+020         CF 2
+021         CF 3
+022         CF 4
+023         13.0                            ; For i in 13..1
+024         STO 16                           ; i
+025         4.0                             ; st-x = 4
+026         LBL 08	;[INIT-LOOP]
+027             STO IND 16                     ; 4->(i)
+028             DSE 16                       ; DSE i
+029         GTO 08	;[INIT-LOOP]
+030         0.0                             ; i now equals zero
+031         STO IND 16                         ; 0->(i), i = 0
+032         7.0
+033         STO 16
+034         X<>Y
+035         STO IND 16                         ; 0->(i), i = 7
+036         SF 1                            ; P1'S Turn
+037         GRAD                            ; 42s Only, P1 indicator
+038     RTN
+039     LBL 02	;[CHECK-WINNER]
+040         CF 3                            ; Clear winner found flag
+041         0
+042         STO 17                           ; j
+043         7
+044         STO 16                           ; i
+045         24.0
+046         RCL IND 16                         ; (i)
+047         X>=Y?
+048             GTO 14	;[P1-WINNER]
+049         X<>Y
+050         RCL IND 17                         ; (j)
+051         X>=Y?
+052             GTO 17	;[P2-WINNER]
+053         GTO 28	;[WINNER-RTN]
+054         LBL 14	;[P1-WINNER]
+055             "Player 1 won!"
+056             GTO 27	;[WINNER-DONE]
+057         LBL 17	;[P2-WINNER]
+058             "Player 2 won!"
+059         LBL 27	;[WINNER-DONE]
+060             SF 3                        ; Set winner found flag
+061             PROMPT
+062         LBL 28	;[WINNER-RTN]
+063     RTN
+064     LBL 04	;[DISPLAY]
+065         1.006
+066         STO 16                           ; i
+067         14
+068         STO 17                           ; "$(j)" == "$(14)"
+069         1000000.0
+070         STO IND 17                         ; (j)=1,000,000
+071         LBL 12	;[P1-BOARD]
+072             10.0                        ; WARN Base 10 for now
+073             6
+074             RCL 16                       ; i
+075             IP
+076             -
+077             Y^X                         ; i^(6-ip(i))
+078             RCL IND 16                     ; (i)
+079             x                           ; i^(6-ip(i)) * $(i)
+080             STO+ IND 17                    ; @(j) += i^(6-ip(i)) + $(i)
+081             ISG 16                       ; i
+082         GTO 12	;[P1-BOARD]
+083         15
+084         STO 17                           ; j = P2-vector
+085         1000000.0
+086         STO IND 17
+087         13.007
+088         STO 16
+089         LBL 15	;[P2-BOARD]
+090             10.0                        ; WARN Base 10 for now
+091             RCL 16
+092             IP
+093             8
+094             -
+095             Y^X
+096             RCL IND 16
+097             x
+098             STO+ IND 17
+099             DSE 16
+100         GTO 15	;[P2-BOARD]
+101         14
+102         STO 16                           ; i = P1-vector
+103         FIX 2
+104         RCL 7                           ; P1 SCORE
+105         100
+106         /
+107         STO+ IND 16                        ; P1 VECTOR
+108         RCL 0
+109         100
+110         /
+111         STO+ IND 17                        ; P2 VECTOR
+112         RCL IND 17                         ; P2
+113         RCL IND 16                         ; P1
+114         STOP
+115     RTN
+116     LBL 18	;[PICK]
+117         CF 4
+118         IP
+119         1
+120         X<>Y
+121         X<Y?
+122             SF 4
+123         6
+124         X<>Y
+125         X>Y?
+126             SF 4
+127         FS? 4
+128             GTO 19	;[PICK-DONE]
+129         STO 16                           ; i=PICK
+130         FS? 1
+131             GTO 01	;[CHECK-PICK]
+132         14
+133         X<>Y
+134         -
+135         STO 16                           ; i
+136         LBL 01	;[CHECK-PICK]
+137         RCL IND 16                         ; (i)
+138         X=0?
+139             SF 4
+140         LBL 19	;[PICK-DONE]
+141         RCL 16                           ; i
+142     RTN
+143     LBL 10	;[MOVE]
+144         0
+145         X<> IND 16                         ; (i)= 0 (MOVE BEANS OUT)
+146         STO 17                           ; j=VALUE PREVIOUSLY IN (i)
+147         LBL 11	;[MOVE-LOOP]
+148             1.0
+149             RCL+ 16                      ; i++ (MOVE REGISTER FORWARD)
+150             14.0
+151             MOD
+152             STO 16                       ; i=(i+1)MOD(14)
+153             FS? 1                       ; P1?
+154                 XEQ 21	;[SKIP0]             ; SKIP0 IF P1
+155             FS? 2
+156                 XEQ 22	;[SKIP7]             ; SKIP7 IF P2
+157             1.0
+158             STO+ IND 16                    ; (i)=(i)+1
+159             DSE 17                       ; j--
+160         GTO 11	;[MOVE-LOOP]
+161         1.0
+162         RCL IND 16
+163         X=Y?
+164             XEQ 26	;[WIN-BEANS]
+165     RTN
+166     LBL 21	;[SKIP0]
+167         X=0?
+168             ISG 16
+169         CF 0                            ; NOP
+170     RTN
+171     LBL 22	;[SKIP7]
+172         7
+173         X<>Y
+174         X=Y?
+175             ISG 16
+176         CF 0                            ; NOP
+177     RTN
+178     LBL 26	;[WIN-BEANS]
+179         7
+180         RCL 16
+181         FS? 1
+182             GTO 13	;[P1-WINBEANS]
+183         FS? 2
+184             GTO 16	;[P2-WINBEANS]
+185         RTN
+186         LBL 13	;[P1-WINBEANS]
+187             7.0
+188             STO 17
+189             Rv
+190             X>=Y?
+191                 RTN
+192             GTO 06	;[DONE-WINBEANS]
+193         LBL 16	;[P2-WINBEANS]
+194             0.0
+195             STO 17
+196             Rv
+197             X<=Y?
+198                 RTN
+199         LBL 06	;[DONE-WINBEANS]
+200         14.0
+201         X<>Y
+202         -
+203         STO 16
+204         0
+205         X<> IND 16
+206         STO+ IND 17
+207     RTN
+208     LBL 23	;[SWITCH]
+209         7
+210         RCL 16                           ; i contains the final register of move
+211         X=Y?                            ; if i=7, landed in a bank, free move
+212             RTN
+213         X=0?                            ; if i=0, landed in a bank, free move
+214             RTN
+215         FS? 1
+216         GTO 25	;[SWITCHTO-P2]
+217             CF 2
+218             SF 1
+219             GRAD
+220             GTO 24	;[SWITCH-DONE]
+221         LBL 25	;[SWITCHTO-P2]
+222             CF 1
+223             SF 2
+224             RAD
+225         LBL 24	;[SWITCH-DONE]
+226     RTN
+227     LBL 03	;[CLEANUP]
+228         CF 1
+229         CF 2
+230         CF 3
+231         CF 4
+232         FIX 4
+233         DEG
+234     RTN
+235 END
