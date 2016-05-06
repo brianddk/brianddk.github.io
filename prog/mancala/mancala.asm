@@ -81,14 +81,13 @@ LBL "MANCA"
     ;Main Mancala program
         XEQ [INIT]                      ; Init the game registers
         LBL [MAIN]                      ; Main game loop
+            XEQ [DISPLAY]               ; Display the game board
             XEQ [CHECK-WINNER]          ; Check for a winner
             FS? 3                       ; Flag3 = Winner Found!
                 GTO [DONE]              ; Finished when a winner is found
-            LBL [REDISPLAY]             ; Come here if we pick bad
-            XEQ [DISPLAY]               ; Display the game board
             XEQ [PICK]                  ; Pick a move
             FS? 4                       ; Invalid move?
-                GTO [REDISPLAY]         ; .. Redisplay
+                GTO [MAIN]              ; .. Redisplay
             XEQ [MOVE]                  ; Move the beans
             XEQ [SWITCH]                ; Swithch players
         GTO [MAIN]                      ; Loop for next move
@@ -203,11 +202,11 @@ LBL "MANCA"
         ;                               ; 42s only code end
         RCL (J)                         ; P2
         RCL (I)                         ; P1
-        STOP
     RTN
     ;
     ; Pick a pit to move
     LBL [PICK]
+        STOP
         CF 4
         IP
         1
@@ -260,6 +259,11 @@ LBL "MANCA"
         RCL (I)
         X=Y?
             XEQ [WIN-BEANS]
+        XEQ [CHECK-ZPITS]
+        FS? 3
+            XEQ [SWEEP-PITS]
+        FS? 4
+            XEQ [SWEEP-PITS]
     RTN
     ;
     ; SKIP0
@@ -281,8 +285,12 @@ LBL "MANCA"
     ; WIN-BEANS
     LBL [WIN-BEANS]
         ;STOP
-        7
         RCL I
+        X=0?
+            RTN
+        7
+        X=Y?
+            RTN
         FS? 1
             GTO [P1-WINBEANS]
         FS? 2
@@ -292,14 +300,14 @@ LBL "MANCA"
             7.0
             STO J
             Rv
-            X>=Y?
+            X>Y?                       ; I >= 7?
                 RTN
             GTO [DONE-WINBEANS]
         LBL [P2-WINBEANS]
             0.0
             STO J
             Rv
-            X<=Y?
+            X<Y?
                 RTN
         LBL [DONE-WINBEANS]
         14.0
@@ -309,6 +317,32 @@ LBL "MANCA"
         0
         X<> (I)
         STO+ (J)
+    RTN
+    ;
+    ; Check for zero'd pits on a player's side
+    LBL [CHECK-ZPITS]
+        1.006
+        STO I
+        CLST
+        LBL [P1-ZPITS]
+            RCL (I)
+            +
+        GTO [P1-ZPITS]
+        X=0?
+            SF 3
+        8.013
+        STO I
+        CLST
+        LBL [P2-ZPITS]
+            RCL (I)
+            +
+        GTO [P2-ZPITS]
+        X=0?
+            SF 4
+    RTN
+    ;
+    ;
+    LBL [SWEEP-PITS]
     RTN
     ;
     ; Switch to other players turn
@@ -334,6 +368,7 @@ LBL "MANCA"
     ;
     ; Clean up after game
     LBL [CLEANUP]
+        XEQ [DISPLAY]               ; Display the game board
         CF 1
         CF 2
         CF 3
