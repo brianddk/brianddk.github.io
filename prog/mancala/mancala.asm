@@ -121,6 +121,7 @@ LBL "MANCA"
     ;
     ; Check for winner
     LBL [CHECK-WINNER]
+#35s    SF 10                           ; For 35s prompting
         CF 3                            ; Clear winner found flag
         0
         STO J                           ; j
@@ -142,8 +143,9 @@ LBL "MANCA"
             "Player 2 won!"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
-            PROMPT
+#42s        PROMPT
         LBL [WINNER-RTN]
+#35s    CF 10                           ; Restore (35s) default
     RTN
     ;
     ; Display the board

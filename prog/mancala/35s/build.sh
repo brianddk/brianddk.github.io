@@ -1,5 +1,6 @@
 #!/bin/env bash
 
+keep="#35s"
 asm=$1
 lst=${1%.asm}.lst
 txt=${1%.asm}.txt
@@ -21,7 +22,9 @@ sed-list() {
 }
 
 pre-process() {
+    echo "s/$keep/    /g"
     echo "s/^\s\+;.*//g"
+    echo "/^#.*$/d"
     echo "/^\s*$/d"
     echo "/^\s*;.*$/d"
     echo "s/^\(.*\s\+\)LBL/\1;LBL/g"
