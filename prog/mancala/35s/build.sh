@@ -1,5 +1,10 @@
 #!/bin/env bash
 
+asm=$1
+lst=${1%.asm}.lst
+txt=${1%.asm}.txt
+raw=${1%.asm}.raw
+
 get-label() {
     grep ';LBL \[' $1 | awk '{print $1,$3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
 }
@@ -37,4 +42,11 @@ file-withnum() {
     pre-process | sed-list $1 | add-lnum
 }
 
-get-label <(file-withnum $1) | make-sed | sed-list <(file-withnum $1) 
+mklstxt() {
+    tee $1 | sed 's/\s\+;.*//g; s/\s\+/ /g' > $2
+}
+
+get-label <(file-withnum $asm) | make-sed | sed-list <(file-withnum $asm) | mklstxt $lst $txt
+
+mv $txt $(basename $txt)
+mv $lst $(basename $lst)

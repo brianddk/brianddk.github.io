@@ -1,235 +1,235 @@
 M001 LBL "MANCA"
-M002         XEQ M015	;[INIT]                      ; Init the game registers
-M003         ;LBL M003	;[MAIN]                      ; Main game loop
-M003             XEQ M034	;[CHECK-WINNER]          ; Check for a winner
-M004             FS? 3                       ; Flag3 = Winner Found!
-M005                 GTO M013	;[DONE]              ; Finished when a winner is found
-M006             ;LBL M006	;[REDISPLAY]             ; Come here if we pick bad
-M006             XEQ M054	;[DISPLAY]               ; Display the game board
-M007             XEQ M103	;[PICK]                  ; Pick a move
-M008             FS? 4                       ; Invalid move?
-M009                 GTO M006	;[REDISPLAY]         ; .. Redisplay
-M010             XEQ M127	;[MOVE]                  ; Move the beans
-M011             XEQ M184	;[SWITCH]                ; Swithch players
-M012         GTO M003	;[MAIN]                      ; Loop for next move
-M013         ;LBL M013	;[DONE]                      ; This is where we finish
-M013         XEQ M200	;[CLEANUP]                   ; Cleanup we are done
-M014     RTN
-M015     ;LBL M015	;[INIT]                          ; Init the game registers
-M015         CF 1                            ; Clear our flag regs
-M016         CF 2
-M017         CF 3
-M018         CF 4
-M019         13.0                            ; For i in 13..1
-M020         STO I                           ; i
-M021         4.0                             ; st-x = 4
-M022         ;LBL M022	;[INIT-LOOP]
-M022             STO (I)                     ; 4->(i)
-M023             DSE I                       ; DSE i
-M024         GTO M022	;[INIT-LOOP]
-M025         0.0                             ; i now equals zero
-M026         STO (I)                         ; 0->(i), i = 0
-M027         7.0
-M028         STO I
-M029         X<>Y
-M030         STO (I)                         ; 0->(i), i = 7
-M031         SF 1                            ; P1'S Turn
-M032         GRAD                            ; 42s Only, P1 indicator
-M033     RTN
-M034     ;LBL M034	;[CHECK-WINNER]
-M034         CF 3                            ; Clear winner found flag
-M035         0
-M036         STO J                           ; j
-M037         7
-M038         STO I                           ; i
-M039         24.0
-M040         RCL (I)                         ; (i)
-M041         X>=Y?
-M042             GTO M048	;[P1-WINNER]
-M043         X<>Y
-M044         RCL (J)                         ; (j)
-M045         X>=Y?
-M046             GTO M050	;[P2-WINNER]
-M047         GTO M053	;[WINNER-RTN]
-M048         ;LBL M048	;[P1-WINNER]
-M048             "Player 1 won!"
-M049             GTO M051	;[WINNER-DONE]
-M050         ;LBL M050	;[P2-WINNER]
-M050             "Player 2 won!"
-M051         ;LBL M051	;[WINNER-DONE]
-M051             SF 3                        ; Set winner found flag
-M052             PROMPT
-M053         ;LBL M053	;[WINNER-RTN]
-M053     RTN
-M054     ;LBL M054	;[DISPLAY]
-M054         1.006
-M055         STO I                           ; i
-M056         14
-M057         STO J                           ; "$(j)" == "$(14)"
-M058         1000000.0
-M059         STO (J)                         ; (j)=1,000,000
-M060         ;LBL M060	;[P1-BOARD]
-M060             10.0                        ; WARN Base 10 for now
-M061             6
-M062             RCL I                       ; i
-M063             IP
-M064             -
-M065             Y^X                         ; i^(6-ip(i))
-M066             RCL (I)                     ; (i)
-M067             x                           ; i^(6-ip(i)) * $(i)
-M068             STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
-M069             ISG I                       ; i
-M070         GTO M060	;[P1-BOARD]
-M071         15
-M072         STO J                           ; j = P2-vector
-M073         1000000.0
-M074         STO (J)
-M075         13.007
-M076         STO I
-M077         ;LBL M077	;[P2-BOARD]
-M077             10.0                        ; WARN Base 10 for now
-M078             RCL I
-M079             IP
-M080             8
-M081             -
-M082             Y^X
-M083             RCL (I)
-M084             x
-M085             STO+ (J)
-M086             DSE I
-M087         GTO M077	;[P2-BOARD]
-M088         14
-M089         STO I                           ; i = P1-vector
-M090         FIX 2
-M091         RCL 7                           ; P1 SCORE
-M092         100
-M093         /
-M094         STO+ (I)                        ; P1 VECTOR
-M095         RCL 0
-M096         100
-M097         /
-M098         STO+ (J)                        ; P2 VECTOR
-M099         RCL (J)                         ; P2
-M100         RCL (I)                         ; P1
-M101         STOP
-M102     RTN
-M103     ;LBL M103	;[PICK]
-M103         CF 4
-M104         IP
-M105         1
-M106         X<>Y
-M107         X<Y?
-M108             SF 4
-M109         6
-M110         X<>Y
-M111         X>Y?
-M112             SF 4
-M113         FS? 4
-M114             GTO M125	;[PICK-DONE]
-M115         STO I                           ; i=PICK
-M116         FS? 1
-M117             GTO M122	;[CHECK-PICK]
-M118         14
-M119         X<>Y
-M120         -
-M121         STO I                           ; i
-M122         ;LBL M122	;[CHECK-PICK]
-M122         RCL (I)                         ; (i)
-M123         X=0?
-M124             SF 4
-M125         ;LBL M125	;[PICK-DONE]
-M125         RCL I                           ; i
-M126     RTN
-M127     ;LBL M127	;[MOVE]
-M127         0
-M128         X<> (I)                         ; (i)= 0 (MOVE BEANS OUT)
-M129         STO J                           ; j=VALUE PREVIOUSLY IN (i)
-M130         ;LBL M130	;[MOVE-LOOP]
-M130             1.0
-M131             RCL+ I                      ; i++ (MOVE REGISTER FORWARD)
-M132             14.0
-M133             MOD
-M134             STO I                       ; i=(i+1)MOD(14)
-M135             FS? 1                       ; P1?
-M136                 XEQ M148	;[SKIP0]             ; SKIP0 IF P1
-M137             FS? 2
-M138                 XEQ M152	;[SKIP7]             ; SKIP7 IF P2
-M139             1.0
-M140             STO+ (I)                    ; (i)=(i)+1
-M141             DSE J                       ; j--
-M142         GTO M130	;[MOVE-LOOP]
-M143         1.0
-M144         RCL (I)
-M145         X=Y?
-M146             XEQ M158	;[WIN-BEANS]
-M147     RTN
-M148     ;LBL M148	;[SKIP0]
-M148         X=0?
-M149             ISG I
-M150         CF 0                            ; NOP
-M151     RTN
-M152     ;LBL M152	;[SKIP7]
-M152         7
-M153         X<>Y
-M154         X=Y?
-M155             ISG I
-M156         CF 0                            ; NOP
-M157     RTN
-M158     ;LBL M158	;[WIN-BEANS]
-M158         7
-M159         RCL I
-M160         FS? 1
-M161             GTO M165	;[P1-WINBEANS]
-M162         FS? 2
-M163             GTO M171	;[P2-WINBEANS]
-M164         RTN
-M165         ;LBL M165	;[P1-WINBEANS]
-M165             7.0
-M166             STO J
-M167             Rv
-M168             X>=Y?
-M169                 RTN
-M170             GTO M176	;[DONE-WINBEANS]
-M171         ;LBL M171	;[P2-WINBEANS]
-M171             0.0
-M172             STO J
-M173             Rv
-M174             X<=Y?
-M175                 RTN
-M176         ;LBL M176	;[DONE-WINBEANS]
-M176         14.0
-M177         X<>Y
-M178         -
-M179         STO I
-M180         0
-M181         X<> (I)
-M182         STO+ (J)
-M183     RTN
-M184     ;LBL M184	;[SWITCH]
-M184         7
-M185         RCL I                           ; i contains the final register of move
-M186         X=Y?                            ; if i=7, landed in a bank, free move
-M187             RTN
-M188         X=0?                            ; if i=0, landed in a bank, free move
-M189             RTN
-M190         FS? 1
-M191         GTO M196	;[SWITCHTO-P2]
-M192             CF 2
-M193             SF 1
-M194             GRAD
-M195             GTO M199	;[SWITCH-DONE]
-M196         ;LBL M196	;[SWITCHTO-P2]
-M196             CF 1
-M197             SF 2
-M198             RAD
-M199         ;LBL M199	;[SWITCH-DONE]
-M199     RTN
-M200     ;LBL M200	;[CLEANUP]
-M200         CF 1
-M201         CF 2
-M202         CF 3
-M203         CF 4
-M204         FIX 4
-M205         DEG
-M206     RTN
+M002 XEQ M015
+M003
+M003 XEQ M034
+M004 FS? 3
+M005 GTO M013
+M006
+M006 XEQ M054
+M007 XEQ M103
+M008 FS? 4
+M009 GTO M006
+M010 XEQ M127
+M011 XEQ M184
+M012 GTO M003
+M013
+M013 XEQ M200
+M014 RTN
+M015
+M015 CF 1
+M016 CF 2
+M017 CF 3
+M018 CF 4
+M019 13.0
+M020 STO I
+M021 4.0
+M022
+M022 STO (I)
+M023 DSE I
+M024 GTO M022
+M025 0.0
+M026 STO (I)
+M027 7.0
+M028 STO I
+M029 X<>Y
+M030 STO (I)
+M031 SF 1
+M032 GRAD
+M033 RTN
+M034
+M034 CF 3
+M035 0
+M036 STO J
+M037 7
+M038 STO I
+M039 24.0
+M040 RCL (I)
+M041 X>=Y?
+M042 GTO M048
+M043 X<>Y
+M044 RCL (J)
+M045 X>=Y?
+M046 GTO M050
+M047 GTO M053
+M048
+M048 "Player 1 won!"
+M049 GTO M051
+M050
+M050 "Player 2 won!"
+M051
+M051 SF 3
+M052 PROMPT
+M053
+M053 RTN
+M054
+M054 1.006
+M055 STO I
+M056 14
+M057 STO J
+M058 1000000.0
+M059 STO (J)
+M060
+M060 10.0
+M061 6
+M062 RCL I
+M063 IP
+M064 -
+M065 Y^X
+M066 RCL (I)
+M067 x
+M068 STO+ (J)
+M069 ISG I
+M070 GTO M060
+M071 15
+M072 STO J
+M073 1000000.0
+M074 STO (J)
+M075 13.007
+M076 STO I
+M077
+M077 10.0
+M078 RCL I
+M079 IP
+M080 8
+M081 -
+M082 Y^X
+M083 RCL (I)
+M084 x
+M085 STO+ (J)
+M086 DSE I
+M087 GTO M077
+M088 14
+M089 STO I
+M090 FIX 2
+M091 RCL 7
+M092 100
+M093 /
+M094 STO+ (I)
+M095 RCL 0
+M096 100
+M097 /
+M098 STO+ (J)
+M099 RCL (J)
+M100 RCL (I)
+M101 STOP
+M102 RTN
+M103
+M103 CF 4
+M104 IP
+M105 1
+M106 X<>Y
+M107 X<Y?
+M108 SF 4
+M109 6
+M110 X<>Y
+M111 X>Y?
+M112 SF 4
+M113 FS? 4
+M114 GTO M125
+M115 STO I
+M116 FS? 1
+M117 GTO M122
+M118 14
+M119 X<>Y
+M120 -
+M121 STO I
+M122
+M122 RCL (I)
+M123 X=0?
+M124 SF 4
+M125
+M125 RCL I
+M126 RTN
+M127
+M127 0
+M128 X<> (I)
+M129 STO J
+M130
+M130 1.0
+M131 RCL+ I
+M132 14.0
+M133 MOD
+M134 STO I
+M135 FS? 1
+M136 XEQ M148
+M137 FS? 2
+M138 XEQ M152
+M139 1.0
+M140 STO+ (I)
+M141 DSE J
+M142 GTO M130
+M143 1.0
+M144 RCL (I)
+M145 X=Y?
+M146 XEQ M158
+M147 RTN
+M148
+M148 X=0?
+M149 ISG I
+M150 CF 0
+M151 RTN
+M152
+M152 7
+M153 X<>Y
+M154 X=Y?
+M155 ISG I
+M156 CF 0
+M157 RTN
+M158
+M158 7
+M159 RCL I
+M160 FS? 1
+M161 GTO M165
+M162 FS? 2
+M163 GTO M171
+M164 RTN
+M165
+M165 7.0
+M166 STO J
+M167 Rv
+M168 X>=Y?
+M169 RTN
+M170 GTO M176
+M171
+M171 0.0
+M172 STO J
+M173 Rv
+M174 X<=Y?
+M175 RTN
+M176
+M176 14.0
+M177 X<>Y
+M178 -
+M179 STO I
+M180 0
+M181 X<> (I)
+M182 STO+ (J)
+M183 RTN
+M184
+M184 7
+M185 RCL I
+M186 X=Y?
+M187 RTN
+M188 X=0?
+M189 RTN
+M190 FS? 1
+M191 GTO M196
+M192 CF 2
+M193 SF 1
+M194 GRAD
+M195 GTO M199
+M196
+M196 CF 1
+M197 SF 2
+M198 RAD
+M199
+M199 RTN
+M200
+M200 CF 1
+M201 CF 2
+M202 CF 3
+M203 CF 4
+M204 FIX 4
+M205 DEG
+M206 RTN
 M207 END
