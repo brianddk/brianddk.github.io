@@ -42,7 +42,7 @@ add-lnum() {
     while IFS= read line
     do
         i=$((i+1))
-        printf '%03d %s\n' "$i" "$line" 
+        printf '%03d %s\n' "$i" "$line"
     done
 }
 

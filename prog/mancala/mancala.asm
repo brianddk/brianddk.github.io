@@ -164,13 +164,18 @@ LBL "MANCA"
             -
             Y^X                         ; i^(6-ip(i))
             RCL (I)                     ; (i)
+            10
+            X<Y?
+                G
+            LBL [P1-SKIP]
+            Rv
             x                           ; i^(6-ip(i)) * $(i)
             STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
             ISG I                       ; i
         GTO [P1-BOARD]
         15
         STO J                           ; j = P2-vector
-        1000000.0
+        2000000.0
         STO (J)
         13.007
         STO I
@@ -324,25 +329,55 @@ LBL "MANCA"
         1.006
         STO I
         CLST
-        LBL [P1-ZPITS]
+        LBL [LOOP-ZPITS]
             RCL (I)
             +
-        GTO [P1-ZPITS]
+            ISG I
+            GTO [LOOP-ZPITS]
         X=0?
             SF 3
+        14
+        RCL I
+        X>Y?
+            RTN
         8.013
         STO I
         CLST
-        LBL [P2-ZPITS]
-            RCL (I)
-            +
-        GTO [P2-ZPITS]
-        X=0?
-            SF 4
+        GTO [LOOP-ZPITS]
     RTN
     ;
     ;
     LBL [SWEEP-PITS]
+        1.006
+        STO I
+        CLST
+        LBL [LOOP-SWEEP]
+            0
+            X<> (I)
+            +
+            ISG I
+            GTO [LOOP-SWEEP]
+        14
+        RCL I
+        X>Y?
+        GTO [P2-SWEEP]
+        ;P1-SWEEP
+            Rv
+            Rv
+            STO (I)
+            8.013
+            STO I
+            CLST
+            GTO [LOOP-SWEEP]
+        GTO [DONE-SWEEP]
+        LBL [P2-SWEEP]
+            0
+            STO I
+            X<>Y
+            STO (I)
+        LBL [DONE-SWEEP]
+        CF 3
+        CF 4
     RTN
     ;
     ; Switch to other players turn

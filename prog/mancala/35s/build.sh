@@ -34,7 +34,7 @@ add-lnum() {
     while IFS= read line
     do
         i=$((i+1))
-        printf 'M%03d %s\n' "$i" "$line" 
+        printf 'M%03d %s\n' "$i" "$line"
         if [[ $i -gt 1 && "$line" =~ [:alpha:]*[:digit:]*[:space:]*\;LBL ]]; then
             i=$((i-1))
         fi
