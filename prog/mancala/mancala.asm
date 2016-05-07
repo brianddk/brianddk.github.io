@@ -105,30 +105,30 @@ LBL "MANCA"
         STO I                           ; i
         4.0                             ; st-x = 4
         LBL [INIT-LOOP]
-            STO (I)                     ; 4->(i)
-            DSE I                       ; DSE i
+            STO (I)                     ; Put 4 in all the 'pit'
+            DSE I                       ; .. registers
         GTO [INIT-LOOP]
-        0.0                             ; i now equals zero
-        STO (I)                         ; 0->(i), i = 0
-        7.0
+        0.0                             ; Zero out both home pits
+        STO (I)                         ; .. register 0, and
+        7.0                             ; .. register 7.
         STO I
         X<>Y
         STO (I)                         ; 0->(i), i = 7
         SF 1                            ; P1'S Turn
-        GRAD                            ; 42s Only, P1 indicator
+        GRAD                            ; Grad for P1
     RTN
     ;
     ; Check for winner
     LBL [CHECK-WINNER]
 #35s    SF 10                           ; For 35s prompting
         CF 3                            ; Clear winner found flag
-        0
-        STO J                           ; j
-        7
-        STO I                           ; i
-        24.0
-        RCL (I)                         ; (i)
-        X>=Y?
+        0                               ; Put the 'home' pits in i
+        STO J                           ; .. and j
+        7                               ; .. i = p1, j=p2
+        STO I
+        24.0                            ; See if any player has 24
+        RCL (I)                         ; .. if they do
+        X>=Y?                           ; .. then they are a winner
             GTO [P1-WINNER]
         X<>Y
         RCL (J)                         ; (j)
@@ -142,71 +142,95 @@ LBL "MANCA"
             "Player 2 won!"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
-#42s        PROMPT
-        LBL [WINNER-RTN]
+#42s        PROMPT                      ; The 42s uses prompt command
+        LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
 #35s    CF 10                           ; Restore (35s) default
     RTN
     ;
     ; Display the board
     LBL [DISPLAY]
-        1.006
-        STO I                           ; i
-        14
-        STO J                           ; "$(j)" == "$(14)"
-        1000000.0
-        STO (J)                         ; (j)=1,000,000
-        LBL [P1-BOARD]
-            ;STOP
-            10.0                        ; WARN Base 10 for now
-            6
-            RCL I                       ; i
-            IP
-            -
-            Y^X                         ; i^(6-ip(i))
-            RCL (I)                     ; (i)
-            10
-            X<Y?
-                G
-            LBL [P1-SKIP]
-            Rv
-            x                           ; i^(6-ip(i)) * $(i)
-            STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
-            ISG I                       ; i
+        CF 3                            ; We use F3 for overflow
+        CF 4                            ; We use F4 for a player2 indc.
+        14                              ; P1 Vector initialization
+        STO J                           ; Quick init because we will
+        1000000.0                       ; .. j will be used in common
+        STO (J)                         ; .. 1 in millionths place for P1
+        1.006                           ; Loop over R1..R6
+        STO I                           ; .. i is loop counter
+        LBL [P1-BOARD]                  ; Looping over Player 1 side
+            XEQ [DISPLAY-COMMON]        ; Since we call twice, make a sub
         GTO [P1-BOARD]
-        15
+        SF 4                            ; Flag 4 means P2
+        15                              ; Now set up P2
         STO J                           ; j = P2-vector
-        2000000.0
-        STO (J)
-        13.007
+        2000000.0                       ; 2 in millions for P2
+        STO (J)                         ; Like before j is the dereference
+        8.013                           ; Loop over R8..R13
+        STO I                           ; I will be loop counter
+        LBL [P2-BOARD]                  ; Loop for P2
+            XEQ [DISPLAY-COMMON]        ; Flag 4 will make a difference
+        GTO [P2-BOARD]                  ; NOTE: i now has 14.013 in it
+        7                               ; Now we get the score and tack
+        STO I                           ;.. it to the end of the number
+        0                               ;.. as the FP
+        STO J                           ; i = p1-home, j=p2-home
+        0.01
+        RCLx (J)
+        0.01
+        RCLx (I)                        ; st-x = p1-score/100
+        14                              ; .. st-y = p2-score/100
         STO I
-        LBL [P2-BOARD]
-            ;STOP
-            10.0                        ; WARN Base 10 for now
-            RCL I
-            IP
-            8
-            -
-            Y^X
-            RCL (I)
-            x
-            STO+ (J)
-            DSE I
-        GTO [P2-BOARD]
-        14
-        STO I                           ; i = P1-vector
-        ;                               ; 42s only code begin
-        FIX 2
-        RCL 7                           ; P1 SCORE
-        100
-        /
-        STO+ (I)                        ; P1 VECTOR
-        RCL 0
-        100
-        /
-        STO+ (J)                        ; P2 VECTOR
-        ;                               ; 42s only code end
+        15
+        STO J                           ; i = p1 vector, j=p2-vector
+        Rv                              ; st-x = p1-score/100
+        Rv                              ; .. st-y = p2-score/100
+        STO+ (I)
+        X<>Y
+        STO+ (J)
         RCL (J)                         ; P2
         RCL (I)                         ; P1
+        CF 3                            ; Clear the flags
+        CF 4                            ; .. we don't need anymore
+        FIX 2
+    RTN
+    ;
+    ;DISPLAY-COMMON
+    LBL [DISPLAY-COMMON]
+        ;STOP
+        10.0                        ; WARN Base 10 for now
+        FS? 4                       ; P2 VECTOR
+            GTO [P2-DISPCMN]
+        ; ELSE
+            6
+            RCL I                       ; i p1
+            IP
+            GTO [P2-DISPCMN-DONE]
+        LBL [P2-DISPCMN]
+            RCL I                   ; p2
+            IP
+            8
+        LBL [P2-DISPCMN-DONE]
+        -
+        Y^X                         ; i^(6-ip(i))
+        RCL (I)                     ; (i)
+        9                           ; 9, (i), i^z
+        X<Y?                        ; Then we have overflowed
+            XEQ [OVERFLOW]
+        Rv
+        x                           ; i^(6-ip(i)) * $(i)
+        STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
+        ISG I                       ; i
+    RTN
+    ;
+    ;OVERFLOW
+    LBL [OVERFLOW]
+        ; 9, (i), i^z
+        CLX
+        RCL (J)
+        4000000
+        MOD
+        LASTX
+        STO+ (J)
     RTN
     ;
     ; Pick a pit to move
@@ -266,8 +290,6 @@ LBL "MANCA"
             XEQ [WIN-BEANS]
         XEQ [CHECK-ZPITS]
         FS? 3
-            XEQ [SWEEP-PITS]
-        FS? 4
             XEQ [SWEEP-PITS]
     RTN
     ;
