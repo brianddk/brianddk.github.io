@@ -121,6 +121,7 @@ LBL "MANCA"
     ;
     ; Check for winner
     LBL [CHECK-WINNER]
+#35s    SF 10                           ; For 35s prompting
         CF 3                            ; Clear winner found flag
         0
         STO J                           ; j
@@ -142,8 +143,9 @@ LBL "MANCA"
             "Player 2 won!"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
-            PROMPT
-        LBL [WINNER-RTN]
+#42s        PROMPT                      ; The 42s uses prompt command
+        LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
+#35s    CF 10                           ; Restore (35s) default
     RTN
     ;
     ; Display the board
@@ -169,7 +171,7 @@ LBL "MANCA"
         GTO [P1-BOARD]
         15
         STO J                           ; j = P2-vector
-        1000000.0
+        2000000.0
         STO (J)
         13.007
         STO I
@@ -186,21 +188,26 @@ LBL "MANCA"
             STO+ (J)
             DSE I
         GTO [P2-BOARD]
-        14
-        STO I                           ; i = P1-vector
-        ;                               ; 42s only code begin
-        FIX 2
-        RCL 7                           ; P1 SCORE
-        100
-        /
-        STO+ (I)                        ; P1 VECTOR
-        RCL 0
-        100
-        /
-        STO+ (J)                        ; P2 VECTOR
-        ;                               ; 42s only code end
+        7                               ; Now we get the score and tack
+        STO I                           ;.. it to the end of the number
+        0                               ;.. as the FP
+        STO J                           ; i = p1-home, j=p2-home
+        0.01
+        RCLx (J)
+        0.01
+        RCLx (I)                        ; st-x = p1-score/100
+        14                              ; .. st-y = p2-score/100
+        STO I
+        15
+        STO J                           ; i = p1 vector, j=p2-vector
+        Rv                              ; st-x = p1-score/100
+        Rv                              ; .. st-y = p2-score/100
+        STO+ (I)
+        X<>Y
+        STO+ (J)
         RCL (J)                         ; P2
         RCL (I)                         ; P1
+        FIX 2
         STOP
     RTN
     ;

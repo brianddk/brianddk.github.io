@@ -1,5 +1,7 @@
 #!/bin/env bash
 
+alais rebuild='source ./build.sh ../mancala.asm'
+
 keep="#42s"
 asm=$1
 lst=${1%.asm}.lst
