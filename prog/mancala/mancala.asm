@@ -102,16 +102,16 @@ LBL "MANCA"
         CF 2
         CF 3
         CF 4
-        13.0                            ; For i in 13..1
+        13                              ; For i in 13..1
         STO I                           ; i
-        4.0                             ; st-x = 4
+        4                               ; st-x = 4
         LBL [INIT-LOOP]
             STO (I)                     ; 4->(i)
             DSE I                       ; DSE i
         GTO [INIT-LOOP]
-        0.0                             ; i now equals zero
+        0                               ; i now equals zero
         STO (I)                         ; 0->(i), i = 0
-        7.0
+        7  
         STO I
         X<>Y
         STO (I)                         ; 0->(i), i = 7
@@ -127,22 +127,23 @@ LBL "MANCA"
         STO J                           ; j
         7
         STO I                           ; i
-        24.0
         RCL (I)                         ; (i)
-        X>=Y?
+        24  
+        X<=Y?
             GTO [P1-WINNER]
-        X<>Y
         RCL (J)                         ; (j)
-        X>=Y?
+        X<>Y
+        X<=Y?
             GTO [P2-WINNER]
         GTO [WINNER-RTN]
         LBL [P1-WINNER]
-            "Player 1 won!"
+            "PLAYER 1 WON"
             GTO [WINNER-DONE]
         LBL [P2-WINNER]
-            "Player 2 won!"
+            "PLAYER 2 WON"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
+#41c        PROMPT                      ; The 42s uses prompt command
 #42s        PROMPT                      ; The 42s uses prompt command
         LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
 #35s    CF 10                           ; Restore (35s) default
@@ -154,11 +155,11 @@ LBL "MANCA"
         STO I                           ; i
         14
         STO J                           ; "$(j)" == "$(14)"
-        1000000.0
+        1000000  
         STO (J)                         ; (j)=1,000,000
         LBL [P1-BOARD]
             ;STOP
-            10.0                        ; WARN Base 10 for now
+            10                          ; WARN Base 10 for now
             6
             RCL I                       ; i
             IP
@@ -171,20 +172,20 @@ LBL "MANCA"
         GTO [P1-BOARD]
         15
         STO J                           ; j = P2-vector
-        2000000.0
+        2000000  
         STO (J)
         13.007
         STO I
         LBL [P2-BOARD]
             ;STOP
-            10.0                        ; WARN Base 10 for now
+            10                          ; WARN Base 10 for now
             RCL I
             IP
             8
             -
             Y^X
             RCL (I)
-            x
+            x  ; *
             STO+ (J)
             DSE I
         GTO [P2-BOARD]
@@ -193,9 +194,11 @@ LBL "MANCA"
         0                               ;.. as the FP
         STO J                           ; i = p1-home, j=p2-home
         0.01
-        RCLx (J)
+        RCL (J) 
+        x
         0.01
-        RCLx (I)                        ; st-x = p1-score/100
+        RCL (I)                        ; st-x = p1-score/100
+        x
         14                              ; .. st-y = p2-score/100
         STO I
         15
@@ -214,7 +217,7 @@ LBL "MANCA"
     ; Pick a pit to move
     LBL [PICK]
         CF 4
-        IP
+        IP ; INT
         1
         X<>Y
         X<Y?
@@ -247,9 +250,10 @@ LBL "MANCA"
         STO J                           ; j=VALUE PREVIOUSLY IN (i)
         LBL [MOVE-LOOP]
             ; INCI SUBROUTINE-INLINE
-            1.0
-            RCL+ I                      ; i++ (MOVE REGISTER FORWARD)
-            14.0
+            1  
+            RCL I                      ; i++ (MOVE REGISTER FORWARD)
+            +
+            14  
             MOD
             STO I                       ; i=(i+1)MOD(14)
             FS? 1                       ; P1?
@@ -257,11 +261,11 @@ LBL "MANCA"
             FS? 2
                 XEQ [SKIP7]             ; SKIP7 IF P2
             ; INCI END-SUBROUTINE-INLINE
-            1.0
+            1  
             STO+ (I)                    ; (i)=(i)+1
             DSE J                       ; j--
         GTO [MOVE-LOOP]
-        1.0
+        1  
         RCL (I)
         X=Y?
             XEQ [WIN-BEANS]
@@ -286,28 +290,29 @@ LBL "MANCA"
     ; WIN-BEANS
     LBL [WIN-BEANS]
         ;STOP
-        7
         RCL I
+        7
         FS? 1
             GTO [P1-WINBEANS]
         FS? 2
             GTO [P2-WINBEANS]
         RTN
         LBL [P1-WINBEANS]
-            7.0
+            7  
             STO J
             Rv
-            X>=Y?
+            X<=Y?
                 RTN
             GTO [DONE-WINBEANS]
         LBL [P2-WINBEANS]
-            0.0
+            0  
             STO J
             Rv
             X<=Y?
                 RTN
         LBL [DONE-WINBEANS]
-        14.0
+        X<>Y
+        14  
         X<>Y
         -
         STO I
