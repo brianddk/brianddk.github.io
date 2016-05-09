@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-alais rebuild='source ./build.sh ../mancala.asm'
+alias rebuild='source ./build.sh ../mancala.asm'
 
 keep="#42s"
 asm=$1
