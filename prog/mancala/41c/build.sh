@@ -12,7 +12,9 @@ braw=$(basename $raw)
 btxt=$(basename $txt)
 blst=$(basename $lst)
 blog=$(basename $log)
-
+rlst=../rel/${blst%.lst}-41cx.lst
+rtxt=../rel/${btxt%.txt}-41cx.txt
+rraw=../rel/${braw%.raw}-41cx.raw
 
 get-label() {
     grep 'LBL \[' $1 | awk '{print $3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
@@ -90,5 +92,10 @@ dbconf="$(cygpath -w $hp41conf)"
 mv ${raw^^} $braw
 mv $txt $btxt
 mv $lst $blst
+
+
+cp $braw $rraw
+cp $btxt $rtxt
+cp $blst $rlst
 
 cat /tmp/${blog^^}

@@ -316,7 +316,11 @@ LBL "MANCA"
                 RTN
         LBL [DONE-WINBEANS]
         CLX
+        X<> (I)
+        STO+ (J)
+        CLX
         14
+        X<>Y
         -
         STO I
         0

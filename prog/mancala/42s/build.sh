@@ -7,6 +7,12 @@ asm=$1
 lst=${1%.asm}.lst
 txt=${1%.asm}.txt
 raw=${1%.asm}.raw
+braw=$(basename $raw)
+btxt=$(basename $txt)
+blst=$(basename $lst)
+rlst=../rel/${blst%.lst}-42s.lst
+rtxt=../rel/${btxt%.txt}-42s.txt
+rraw=../rel/${braw%.raw}-42s.raw
 
 get-label() {
     grep 'LBL \[' $1 | awk '{print $3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
@@ -59,6 +65,10 @@ mklstxt() {
 get-label <(file-withnum $asm) | make-sed | sed-list <(file-withnum $asm) | mklstxt $lst $txt
 perl ../txt2raw.pl $txt
 
-mv $txt.raw $(basename $raw)
-mv $txt $(basename $txt)
-mv $lst $(basename $lst)
+mv $txt.raw $braw
+mv $txt $btxt
+mv $lst $blst
+
+cp $braw $rraw
+cp $btxt $rtxt
+cp $blst $rlst
