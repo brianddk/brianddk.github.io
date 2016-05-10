@@ -80,7 +80,7 @@ cat << EOF >> "$hp41conf"
     mount p: $rawout
     mount h: $hp41uc
     mount t: $tmpdir
-    h:\HP41UC.EXE /t=p:\\$btxt /r=p:\\$braw /g /n /x25 /x26 > t:\\$blog
+    h:\HP41UC.EXE /t=p:\\$btxt /r=p:\\$braw /g /n > t:\\$blog
     exit
 EOF
 

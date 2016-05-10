@@ -111,28 +111,28 @@ LBL "MANCA"
         GTO [INIT-LOOP]
         0                               ; i now equals zero
         STO (I)                         ; 0->(i), i = 0
-        7  
+        7
         STO I
         X<>Y
         STO (I)                         ; 0->(i), i = 7
         SF 1                            ; P1'S Turn
         GRAD                            ; 42s Only, P1 indicator
     RTN
-    ;
-    ; Check for winner
-    LBL [CHECK-WINNER]
+    ;                                   ; This routine will check for
+    ; Check for winner                  ; .. the winner by looking at
+    LBL [CHECK-WINNER]                  ; .. the 'home pits'
 #35s    SF 10                           ; For 35s prompting
         CF 3                            ; Clear winner found flag
-        0
-        STO J                           ; j
-        7
-        STO I                           ; i
-        RCL (I)                         ; (i)
-        24  
+        0                               ; i = P1-home
+        STO J                           ; j = P2-home
+        7                               ; Compare P1-home to 24
+        STO I                           ; .. if it is .gte. then won!
+        RCL (I)                         ; p1-home,7,0
+        24                              ; 24,p1h,7,0
         X<=Y?
             GTO [P1-WINNER]
-        RCL (J)                         ; (j)
-        X<>Y
+        RCL (J)                         ; p2h,24,p1h,7
+        X<>Y                            ; 24,p2h,p1h,7
         X<=Y?
             GTO [P2-WINNER]
         GTO [WINNER-RTN]
@@ -155,37 +155,37 @@ LBL "MANCA"
         STO I                           ; i
         14
         STO J                           ; "$(j)" == "$(14)"
-        1000000  
+        1000000
         STO (J)                         ; (j)=1,000,000
-        LBL [P1-BOARD]
+        LBL [P1-BOARD]                  ; 1m,14,1..
             ;STOP
             10                          ; WARN Base 10 for now
-            6
-            RCL I                       ; i
+            6                           ; 6,10,1m,14
+            RCL I                       ; i,6,10,1m
             IP
-            -
-            Y^X                         ; i^(6-ip(i))
-            RCL (I)                     ; (i)
-            x                           ; i^(6-ip(i)) * $(i)
+            -                           ; 6-ip,10,1m,1m
+            Y^X                         ; 10^(6-ip(i)),1m,1m,1m
+            RCL (I)                     ; Ri,10^6-i,1m,1m
+            x                           ; 10^(6-ip(i)) * $(i)
             STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
-            ISG I                       ; i
+            ISG I                       ; loop
         GTO [P1-BOARD]
         15
         STO J                           ; j = P2-vector
-        2000000  
+        2000000
         STO (J)
         13.007
         STO I
         LBL [P2-BOARD]
             ;STOP
             10                          ; WARN Base 10 for now
-            RCL I
+            RCL I                       ; i,10,13.,2m
             IP
-            8
-            -
-            Y^X
-            RCL (I)
-            x  ; *
+            8                           ; 8,i,10,13.
+            -                           ; i-8,10,13.,13.
+            Y^X                         ; 10^(i-8),13.,13.
+            RCL (I)                     ; Ri, 10^..,13,13
+            x  ; *                      ; Ri*10^..13,13,13
             STO+ (J)
             DSE I
         GTO [P2-BOARD]
@@ -193,12 +193,12 @@ LBL "MANCA"
         STO I                           ;.. it to the end of the number
         0                               ;.. as the FP
         STO J                           ; i = p1-home, j=p2-home
-        0.01
-        RCL (J) 
-        x
-        0.01
-        RCL (I)                        ; st-x = p1-score/100
-        x
+        0.01                            ; .01,0,7
+        RCL (J)                         ; R0,.01,0,7
+        x                               ; R0%,0,7,7
+        0.01                            ; .01,R0%,0,7
+        RCL (I)                         ; R7,.01,R0%,0
+        x                               ; R7%,R0%,0,0
         14                              ; .. st-y = p2-score/100
         STO I
         15
@@ -210,6 +210,8 @@ LBL "MANCA"
         STO+ (J)
         RCL (J)                         ; P2
         RCL (I)                         ; P1
+#41c    FS? 2
+#41c        X<>Y
         FIX 2
         STOP
     RTN
@@ -250,10 +252,10 @@ LBL "MANCA"
         STO J                           ; j=VALUE PREVIOUSLY IN (i)
         LBL [MOVE-LOOP]
             ; INCI SUBROUTINE-INLINE
-            1  
+            1
             RCL I                      ; i++ (MOVE REGISTER FORWARD)
             +
-            14  
+            14
             MOD
             STO I                       ; i=(i+1)MOD(14)
             FS? 1                       ; P1?
@@ -261,11 +263,11 @@ LBL "MANCA"
             FS? 2
                 XEQ [SKIP7]             ; SKIP7 IF P2
             ; INCI END-SUBROUTINE-INLINE
-            1  
+            1
             STO+ (I)                    ; (i)=(i)+1
             DSE J                       ; j--
         GTO [MOVE-LOOP]
-        1  
+        1
         RCL (I)
         X=Y?
             XEQ [WIN-BEANS]
@@ -291,29 +293,30 @@ LBL "MANCA"
     LBL [WIN-BEANS]
         ;STOP
         RCL I
+        X=0?
+            RTN
         7
+        X=Y?
+            RTN
         FS? 1
             GTO [P1-WINBEANS]
         FS? 2
             GTO [P2-WINBEANS]
         RTN
         LBL [P1-WINBEANS]
-            7  
             STO J
-            Rv
-            X<=Y?
+            X<Y?                       ; 7 < I ?
                 RTN
             GTO [DONE-WINBEANS]
         LBL [P2-WINBEANS]
-            0  
+            0
             STO J
             Rv
-            X<=Y?
+            X>Y?
                 RTN
         LBL [DONE-WINBEANS]
-        X<>Y
-        14  
-        X<>Y
+        CLX
+        14
         -
         STO I
         0
