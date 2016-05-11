@@ -1,16 +1,24 @@
 #!/bin/env bash
 
+alias rebuild='source ./build.sh ../mancala.asm'
+
 keep="#35s"
 asm=$1
 lst=${1%.asm}.lst
 txt=${1%.asm}.txt
-raw=${1%.asm}.raw
+btxt=$(basename $txt)
+blst=$(basename $lst)
+rlst=../rel/${blst%.lst}-35s.lst
+rtxt=../rel/${btxt%.txt}-35s.txt
 
 get-label() {
     grep ';LBL \[' $1 | awk '{print $1,$3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
 }
 
 make-sed() {
+    sleep 0.0001
+    echo "s/\<LBL \"MANCA\"/LBL M/g"
+    echo "s/\<MOD\>/RMDR/g"
     while read -r lnum label
     do
         echo "s/\(\[$label\]\)/$lnum\t;\1/g"
@@ -24,6 +32,7 @@ sed-list() {
 pre-process() {
     echo "s/$keep/    /g"
     echo "s/^\s\+;.*//g"
+    echo "/^END\>/d"
     echo "/^#.*$/d"
     echo "/^\s*$/d"
     echo "/^\s*;.*$/d"
@@ -51,5 +60,8 @@ mklstxt() {
 
 get-label <(file-withnum $asm) | make-sed | sed-list <(file-withnum $asm) | mklstxt $lst $txt
 
-mv $txt $(basename $txt)
-mv $lst $(basename $lst)
+mv $txt $btxt
+mv $lst $blst
+
+cp $btxt $rtxt
+cp $blst $rlst

@@ -2,17 +2,19 @@
 
 alias rebuild='source ./build.sh ../mancala.asm'
 
-keep="#42s"
+keep="#41c"
 asm=$1
 lst=${1%.asm}.lst
 txt=${1%.asm}.txt
 raw=${1%.asm}.raw
+log=${1%.asm}.log
 braw=$(basename $raw)
 btxt=$(basename $txt)
 blst=$(basename $lst)
-rlst=../rel/${blst%.lst}-42s.lst
-rtxt=../rel/${btxt%.txt}-42s.txt
-rraw=../rel/${braw%.raw}-42s.raw
+blog=$(basename $log)
+rlst=../rel/${blst%.lst}-41cx.lst
+rtxt=../rel/${btxt%.txt}-41cx.txt
+rraw=../rel/${braw%.raw}-41cx.raw
 
 get-label() {
     grep 'LBL \[' $1 | awk '{print $3}' | sort | uniq | sed -s 's/\[//g;s/\]//g'
@@ -26,6 +28,10 @@ make-sed() {
     echo "s/\s(J)/ IND $jvar/g"
     echo "s/\<I\>/$ivar/g"
     echo "s/\<J\>/$jvar/g"
+    echo "s/\<x\>/\*/g"
+    echo "s/\<Rv\>/RDN/g"
+    echo "s/\<IP\>/INT/g"
+    echo "s/\<STO+/ST+/g"
     while read line
     do
         i=$((i+1))
@@ -63,12 +69,33 @@ mklstxt() {
 }
 
 get-label <(file-withnum $asm) | make-sed | sed-list <(file-withnum $asm) | mklstxt $lst $txt
-perl ../txt2raw.pl $txt
 
-mv $txt.raw $braw
+dosbox="$(cygpath -u "$(cmd /c "<NUL set /p=%programfiles(x86)%\DOSBox-0.74\DOSBox.exe")")"
+dbconf="$LOCALAPPDATA/DOSBox/dosbox-0.74.conf"
+hp41conf="/tmp/41c.conf"
+tmpdir="$(cygpath -w /tmp)"
+rawout="$(cygpath -w $(cd $(dirname $raw); pwd))"
+hp41uc="$(cygpath -w $APPDATA/hp41uc)"
+cp "$dbconf" "$hp41conf"
+
+cat << EOF >> "$hp41conf"
+    mount p: $rawout
+    mount h: $hp41uc
+    mount t: $tmpdir
+    h:\HP41UC.EXE /t=p:\\$btxt /r=p:\\$braw /g /n > t:\\$blog
+    exit
+EOF
+
+dbconf="$(cygpath -w $hp41conf)"
+"$dosbox" -conf "$dbconf"
+
+mv ${raw^^} $braw
 mv $txt $btxt
 mv $lst $blst
+
 
 cp $braw $rraw
 cp $btxt $rtxt
 cp $blst $rlst
+
+cat /tmp/${blog^^}

@@ -4,5 +4,7 @@ _site
 prog/mancala/print.txt
 prog/mancala/txt2raw.pl
 prog/mancala/txt2raw.prm
+prog/mancala/35s/mancala.*
+prog/mancala/42s/mancala.*
+prog/mancala/41c/mancala.*
 prog/mancala/rel
-prog/mancala/41c
