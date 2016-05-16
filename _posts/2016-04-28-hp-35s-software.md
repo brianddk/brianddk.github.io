@@ -27,3 +27,4 @@ This is a small collection of useful hp 35s program listings (aka software) for 
 18. [Bodies in motion](http://www.hpmuseum.org/software/33smotn.htm), (Change `GTO A` to `GTO A001` for `GTO/XEQ` for all labels).
 19. [Fibbonacci Function](http://www.hpmuseum.org/software/34fibon.htm)
 20. [Great SW Thread](http://www.hpmuseum.org/forum/thread-3785.html)
+21. [Survey SW for 35s](http://www.hpmuseum.org/forum/thread-5207.html)
