@@ -81,7 +81,7 @@ LBL "MANCA"
     ;Main Mancala program
         XEQ [INIT]                      ; Init the game registers
         LBL [MAIN]                      ; Main game loop
-            XEQ [DISPLAY]               ; Display the game board
+            XEQ [MKSCORE]               ; Display the game board
             XEQ [CHECK-WINNER]          ; Check for a winner
             FS? 3                       ; Flag3 = Winner Found!
                 GTO [DONE]              ; Finished when a winner is found
@@ -154,20 +154,15 @@ LBL "MANCA"
             "PLAYER 2 WON"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
-            14
-            STO I
-            15
-            STO J
-            RCL (J)                         ; P2
-            RCL (I)                         ; P1
+            XEQ [DISPLAY]
 #41c        PROMPT                      ; The 42s uses prompt command
 #42s        PROMPT                      ; The 42s uses prompt command
         LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
 #35s    CF 10                           ; Restore (35s) default
     RTN
     ;
-    ; Display the board
-    LBL [DISPLAY]
+    ; Record the score
+    LBL [MKSCORE]
         CF 3                            ; We use F3 for overflow
         CF 4                            ; We use F4 for a player2 indc.
         1.006
@@ -177,7 +172,7 @@ LBL "MANCA"
         1000000
         STO (J)                         ; (j)=1,000,000
         LBL [P1-BOARD]                  ; 1m,14,1..
-            XEQ [DISPLAY-COMMON]        ; Since we call twice, make a sub
+            XEQ [MKSCORE-COMMON]        ; Since we call twice, make a sub
             FS? 3
         GTO [P1-BOARD]
         SF 4                            ; Flag 4 means P2        
@@ -188,7 +183,7 @@ LBL "MANCA"
         8.013                           ; Loop over R8..R13
         STO I                           ; I will be loop counter
         LBL [P2-BOARD]
-            XEQ [DISPLAY-COMMON]        ; Since we call twice, make a sub
+            XEQ [MKSCORE-COMMON]        ; Since we call twice, make a sub
             FS? 3
         GTO [P2-BOARD]
         7                               ; Now we get the score and tack
@@ -210,30 +205,28 @@ LBL "MANCA"
         STO+ (I)
         X<>Y
         STO+ (J)
-#41c    FS? 2
-#41c        X<>Y
         CF 3                            ; Clear the flags
         CF 4                            ; .. we don't need anymore
         FIX 2
     RTN
     ;
-    ;DISPLAY-COMMON
-    LBL [DISPLAY-COMMON]
+    ;MKSCORE-COMMON
+    LBL [MKSCORE-COMMON]
         ;STOP
         CF 3
         10.0                        ; WARN Base 10 for now
         FS? 4                       ; P2 VECTOR
-            GTO [P2-DISPCMN]
+            GTO [P2-MKSCRCMN]
         ; ELSE
             6
             RCL I                       ; i p1
             IP
-            GTO [P2-DISPCMN-DONE]
-        LBL [P2-DISPCMN]
+            GTO [P2-MKSCRCMN-DONE]
+        LBL [P2-MKSCRCMN]
             RCL I                   ; p2
             IP
             8
-        LBL [P2-DISPCMN-DONE]
+        LBL [P2-MKSCRCMN-DONE]
         -
         Y^X                         ; i^(6-ip(i))
         RCL (I)                     ; (i)
@@ -262,15 +255,7 @@ LBL "MANCA"
     ;
     ; Pick a pit to move
     LBL [PICK]
-        14
-        STO I
-        15
-        STO J
-        1
-        FS? 2
-        2
-        RCL (J)                         ; P2
-        RCL (I)                         ; P1
+        XEQ [DISPLAY]
         STOP
         CF 4
         IP ; INT
@@ -447,6 +432,21 @@ LBL "MANCA"
         LBL [DONE-SWEEP]
         CF 3
         CF 4
+    RTN
+    ;
+    ; Display the score
+    LBL [DISPLAY]
+        14
+        STO I
+        15
+        STO J
+        1
+        FS? 2
+        2
+        RCL (J)                         ; P2
+        RCL (I)                         ; P1
+#41c    FS? 2
+#41c        X<>Y
     RTN
     ;
     ; Switch to other players turn
