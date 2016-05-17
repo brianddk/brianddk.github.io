@@ -127,13 +127,25 @@ LBL "MANCA"
         7                               ; Compare P1-home to 24
         STO I                           ; .. if it is .gte. then won!
         RCL (I)                         ; p1-home,7,0
-        24                              ; 24,p1h,7,0
+        25                              ; 25,p1h,7,0
         X<=Y?
             GTO [P1-WINNER]
-        RCL (J)                         ; p2h,24,p1h,7
-        X<>Y                            ; 24,p2h,p1h,7
+        RCL (J)                         ; p2h,25,p1h,7
+        X<>Y                            ; 25,p2h,p1h,7
         X<=Y?
             GTO [P2-WINNER]
+        Rv
+        X=Y?
+            GTO [CHECK-TIE]
+        GTO [WINNER-RTN]
+        LBL [CHECK-TIE]
+            R^
+            1
+            -
+            X!=Y?
+                GTO [WINNER-RTN]
+            "TIE GAME"
+            GTO [WINNER-DONE]
         GTO [WINNER-RTN]
         LBL [P1-WINNER]
             "PLAYER 1 WON"
@@ -142,6 +154,12 @@ LBL "MANCA"
             "PLAYER 2 WON"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
+            14
+            STO I
+            15
+            STO J
+            RCL (J)                         ; P2
+            RCL (I)                         ; P1
 #41c        PROMPT                      ; The 42s uses prompt command
 #42s        PROMPT                      ; The 42s uses prompt command
         LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
@@ -160,6 +178,7 @@ LBL "MANCA"
         STO (J)                         ; (j)=1,000,000
         LBL [P1-BOARD]                  ; 1m,14,1..
             XEQ [DISPLAY-COMMON]        ; Since we call twice, make a sub
+            FS? 3
         GTO [P1-BOARD]
         SF 4                            ; Flag 4 means P2        
         15
@@ -170,6 +189,7 @@ LBL "MANCA"
         STO I                           ; I will be loop counter
         LBL [P2-BOARD]
             XEQ [DISPLAY-COMMON]        ; Since we call twice, make a sub
+            FS? 3
         GTO [P2-BOARD]
         7                               ; Now we get the score and tack
         STO I                           ;.. it to the end of the number
@@ -190,8 +210,6 @@ LBL "MANCA"
         STO+ (I)
         X<>Y
         STO+ (J)
-        RCL (J)                         ; P2
-        RCL (I)                         ; P1
 #41c    FS? 2
 #41c        X<>Y
         CF 3                            ; Clear the flags
@@ -202,6 +220,7 @@ LBL "MANCA"
     ;DISPLAY-COMMON
     LBL [DISPLAY-COMMON]
         ;STOP
+        CF 3
         10.0                        ; WARN Base 10 for now
         FS? 4                       ; P2 VECTOR
             GTO [P2-DISPCMN]
@@ -225,21 +244,33 @@ LBL "MANCA"
         x                           ; i^(6-ip(i)) * $(i)
         STO+ (J)                    ; @(j) += i^(6-ip(i)) + $(i)
         ISG I                       ; i
+        SF 3                        ; NOP
     RTN
     ;
     ;OVERFLOW
     LBL [OVERFLOW]
         ; 9, (i), i^z
-        CLX
-        RCL (J)
-        4000000
-        MOD
-        LASTX
-        STO+ (J)
+        X<>Y                        ; (i), 9, i^z
+        CLX                         ; 9, i^z
+        RCL (J)                     ; vect, 9, i^z
+        4000000                     ; 4m, vect, 9, i^z
+        MOD                         ; vect, 9, i^z
+        LASTX                       ; 4m, vect, 9, i^z
+        +                           ; 4m+vect, 9, i^z
+        STO (J)                     ; 
     RTN
     ;
     ; Pick a pit to move
     LBL [PICK]
+        14
+        STO I
+        15
+        STO J
+        1
+        FS? 2
+        2
+        RCL (J)                         ; P2
+        RCL (I)                         ; P1
         STOP
         CF 4
         IP ; INT
@@ -318,19 +349,26 @@ LBL "MANCA"
     ; WIN-BEANS
     LBL [WIN-BEANS]
         ;STOP
-        RCL I
+        14                              ; 14, i=4
+        STO J                           ; 14, i=4, j=14
+        RCL I                           ; 4, 14
+        STO- J                          ; 4, 14, i=4, j=10
         X=0?
             RTN
         7
-        X=Y?
+        X=Y?                            ; 7, 4, 14
             RTN
+        RCL (J)                         ; 10, 7, 4, 14
+        X=0?
+            RTN
+        Rv                              ; 7, 4, 13, 10
         FS? 1
             GTO [P1-WINBEANS]
         FS? 2
             GTO [P2-WINBEANS]
         RTN
         LBL [P1-WINBEANS]
-            STO J
+            STO J                       ; i=4, j=7
             X<Y?                       ; 7 < I ?
                 RTN
             GTO [DONE-WINBEANS]
@@ -357,21 +395,21 @@ LBL "MANCA"
     ; Check for zero'd pits on a player's side
     LBL [CHECK-ZPITS]
         1.006
-        STO I
+        STO J
         CLST
         LBL [LOOP-ZPITS]
-            RCL (I)
+            RCL (J)
             +
-            ISG I
+            ISG J
             GTO [LOOP-ZPITS]
         X=0?
             SF 3
         14
-        RCL I
+        RCL J
         X>Y?
             RTN
         8.013
-        STO I
+        STO J
         CLST
         GTO [LOOP-ZPITS]
     RTN
@@ -394,17 +432,18 @@ LBL "MANCA"
         ;P1-SWEEP
             Rv
             Rv
-            STO (I)
+            STO+ (I)
             8.013
             STO I
             CLST
             GTO [LOOP-SWEEP]
         GTO [DONE-SWEEP]
         LBL [P2-SWEEP]
-            0
+            CLX
             STO I
-            X<>Y
-            STO (I)
+            Rv
+            Rv
+            STO+ (I)
         LBL [DONE-SWEEP]
         CF 3
         CF 4
