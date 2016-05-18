@@ -2,7 +2,9 @@
 
 alias rebuild='source ./build.sh ../mancala.asm'
 
-keep="#42s"
+id="42s"
+keep="#$id"
+ditch="#!$id"
 asm=$1
 lst=${1%.asm}.lst
 txt=${1%.asm}.txt
@@ -39,7 +41,9 @@ sed-list() {
 }
 
 pre-process() {
-    echo "s/$keep/    /g"
+    echo "s/^$keep/    /g"
+    echo "s/^$ditch/#not/g"
+    echo "s/^#![[:alnum:]]\+/     /g"
     echo "s/^\s\+;.*//g"
     echo "/^#.*$/d"
     echo "/^\s*$/d"

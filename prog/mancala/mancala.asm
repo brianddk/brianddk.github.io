@@ -155,8 +155,7 @@ LBL "MANCA"
         LBL [WINNER-DONE]
             SF 3                        ; Set winner found flag
             XEQ [DISPLAY]
-#41c        PROMPT                      ; The 42s uses prompt command
-#42s        PROMPT                      ; The 42s uses prompt command
+#!35s       PROMPT                      ; The 42s uses prompt command
         LBL [WINNER-RTN]                ; .. But the 35s uses Flag 10
 #35s    CF 10                           ; Restore (35s) default
     RTN
