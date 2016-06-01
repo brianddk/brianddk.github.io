@@ -12,6 +12,7 @@ Trying to understand how calculators work lead to research on CORDIC and log tab
 3. [Henry Briggs and the HP35](http://home.citycable.ch/pierrefleur/Jacques-Laporte/Briggs%20and%20the%20HP35.htm)
 4. [A reconstruction of the tables of Briggs' Arithmetica logarithmica](https://hal.inria.fr/inria-00543939/document)
 5. [Methods to Approximate Roots](https://en.wikipedia.org/wiki/Methods_of_computing_square_roots) - aka. How did Briggs calc roots?
+6. [Using CORDIC methods for computation in micro-controllers](http://www.siue.edu/~gengel/pdf/cordic.pdf) - best paper ever!!
 
 From [3], we can derive the following functions...
 
