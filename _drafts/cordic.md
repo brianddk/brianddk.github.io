@@ -76,7 +76,7 @@ Focal
 14 STO 02      28 /           42 /
 ```
 
-35s Cordis Multiply
+35s Cordic Multiply
 
 ```
 M001 LBL M             M018 SF 0              M035 GTO M037
