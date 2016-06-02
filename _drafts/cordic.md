@@ -75,3 +75,25 @@ Focal
 13 LBL 00      27 *           41 X<>Y
 14 STO 02      28 /           42 /
 ```
+
+35s Cordis Multiply
+
+```
+M001 LBL M             M018 SF 0              M035 GTO M037
+M002 CF 0              M019 1                 M036 GTO M016
+M003 STO X             M020 STO- I            M037 CF 0
+M004 CLx               M021 FS? 0             M038 CLX
+M005 STO Z             M022 +/-               M039 Z*J
+M006 STO I             M023 CF 0              M040 RTN
+M007 STO J             M024 eqn X+REGX*2^I    M041 IP
+M008 X<>Y              M025 STO X             M042 X=0?
+M009 XEQ M041          M026 X=0?              M043 GTO M050
+M010 STO Y             M027 SF 0              M044 1
+M011 RCL X             M028 eqn Z*J           M045 STO+ J
+M012 XEQ M041          M029 eqn Z-REGZ*Y*2^I  M046 LASTX
+M013 STO X             M030 RCL* J            M047 2
+M014 eqn 2^J           M031 STOP              M048 /
+M015 STO J             M032 LASTX             M049 GTO M041
+M016 RCL X             M033 STO Z             M050 LASTX
+M017 X>0?              M034 FS? 0             M051 RTN
+```
