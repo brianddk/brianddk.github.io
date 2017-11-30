@@ -29,4 +29,4 @@ In order to hold Bitcoin you need what is called a *wallet*.  This is the term f
 Once you have installed one of the wallets you can add coins to it.  Bitcoin / Litecoin / Ethereum.  When you do, you will get an *address* that coins can be sent to.  This is how Changelly will be able to send you your coins.  Exchanges like Coinbase/GDAX will often offer to hold your coins on thier site, and that is fine, but if the site ever goes down, or they [get shutdown](https://btc-e.com/) you could lose your coins.
 
 ## Reward
-If you made it this far and know me.... drop me a line and I can send some coin your way.
+If you made it this far, know me, and have a Litecoin address.... drop me a line and I can send some coin your way.
