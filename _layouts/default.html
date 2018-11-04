@@ -7,6 +7,9 @@
 
     {% include header.html %}
 
+    <!-- ref: https://christianspecht.de/2014/09/15/easy-meta-redirects-with-jekyll/ -->
+    {% if page.redirect %}<h3> Redirecting to <a href="{{ page.redirect }}">{{ page.redirect }}</a> ...</h3>{% endif %}
+    
     <div class="page-content">
       <div class="wrapper">
         {{ content }}
