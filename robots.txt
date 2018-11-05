@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://brianddk.github.io/brianddk.io.sitemap.xml
+Sitemap: https://dwghp.ddns.net/dwghp.net.sitemap.xml
+Sitemap: http://dwblog.ddns.net/dwblog.net.sitemap.xml
+Sitemap: http://bithxedusrw236ji.onion/bithxedusrw236ji.onion.sitemap.xml
+Sitemap: http://bithxedusrw236ji.onion.link/bithxedusrw236ji.link.sitemap.xml
+Sitemap: http://bithxedusrw236ji.onion.ws/bithxedusrw236ji.ws.sitemap.xml
+Sitemap: https://bithxedusrw236ji.onion.sh/bithxedusrw236ji.sh.sitemap.xml
+Sitemap: http://zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.onion/zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.onion.sitemap.xml
+Sitemap: http://zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.onion.ws/zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.ws.sitemap.xml
+Sitemap: http://lggg5usmc5jrle6pxjb7zysnorlp6djzu7ne36geigbcigwfugma.b32.i2p/lggg5usmc5jrle6pxjb7zysnorlp6djzu7ne36geigbcigwfugma.i2p.sitemap.xml
+Sitemap: http://lggg5usmc5jrle6pxjb7zysnorlp6djzu7ne36geigbcigwfugma.b32.i2p.xyz/lggg5usmc5jrle6pxjb7zysnorlp6djzu7ne36geigbcigwfugma.xyz.sitemap.xml
+#Sitemap: http://dwblog.i2p.xyz/dwblog.xyz.sitemap.xml
+#Sitemap: https://zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.onion.sh/zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.sh.sitemap.xml
+#Sitemap: http://zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.onion.link/zgeajoabenj2nac6k5cei5qy62iu5yun5gm2vjnxy65r3p3amzykwxqd.link.sitemap.xml
